@@ -49,3 +49,17 @@ COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=app /var/www/html/public /var/www/html/public
 RUN mkdir -p /var/www/html/storage/app/public \
     && ln -s /var/www/html/storage/app/public /var/www/html/public/storage
+
+# Single-container HTTP service for Render. Compose keeps using app/nginx targets.
+FROM app AS render
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends nginx supervisor \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -f /etc/nginx/sites-enabled/default
+COPY docker/render/nginx.conf.template /etc/nginx/render.conf.template
+COPY docker/render/supervisord.conf /etc/supervisor/render.conf
+COPY docker/render/entrypoint.sh /usr/local/bin/render-entrypoint
+RUN chmod +x /usr/local/bin/render-entrypoint
+EXPOSE 10000
+ENTRYPOINT ["render-entrypoint"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/render.conf"]
