@@ -17,7 +17,7 @@ yarn-error.log
 .env.docker
 package-lock.json
 
-composer.lock
+# composer.lock
 
 .php-cs-fixer.cache
 /storage/hang-ve-firebase-adminsdk-*.json
