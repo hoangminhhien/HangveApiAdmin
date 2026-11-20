@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Http\Resources\Customer;
+
+use App\Constants\WarehouseConstant;
+use App\Helpers\ConvertHelper;
+use App\Models\ReportCustomer;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class InfoDeliveryResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     */
+    public function toArray($request)
+    {
+
+        $warehouseCode = optional($this->warehouse)->code;
+        $warehouseColor = WarehouseConstant::STATUSES_COLOR[$warehouseCode] ?? null;
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'phone_number' => $this->phone_number,
+            'warehouse_code' => $warehouseCode,
+            'warehouse_color' => $warehouseColor,
+            //'balance_amount' => optional(ReportCustomer::query()->where('customer_id', $this->id)->first())->balance_amount ?? 0
+            'balance_amount' => optional($this->report)->balance_amount ?? 0,
+            'source' => $this->source,
+        ];
+    }
+}
